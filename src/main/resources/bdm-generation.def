@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition:ConnectorDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:definition="http://www.bonitasoft.org/ns/connector/definition/6.1">
+  <id>bdm-generation</id>
+  <version>1.0.0</version>
+  <icon>connector.png</icon>
+  <category icon="connector.png" id="Custom"/>
+  <input defaultValue="jdbc:postgresql://localhost:5432/database" mandatory="true" name="jdbcUrl" type="java.lang.String"/>
+  <input defaultValue="postgres" mandatory="true" name="userName" type="java.lang.String"/>
+  <input defaultValue="example" mandatory="true" name="password" type="java.lang.String"/>
+  <input defaultValue="org.postgresql.Driver" mandatory="true" name="driver" type="java.lang.String"/>
+  <output name="sqlMetadata" type="java.lang.Object"/>
+  <output name="bdmZipFile" type="org.bonitasoft.engine.bpm.document.DocumentValue"/>
+  <page id="bdmGenerationConfigurationPageId">
+    <widget xsi:type="definition:Text" id="jdbcUrlnputWidget" inputName="jdbcUrl"/>
+    <widget xsi:type="definition:Text" id="dataBaseUserNameId" inputName="userName"/>
+    <widget xsi:type="definition:Text" id="databasePasswordId" inputName="password"/>
+    <widget xsi:type="definition:Text" id="jdbcDriverId" inputName="driver"/>
+  </page>
+</definition:ConnectorDefinition>

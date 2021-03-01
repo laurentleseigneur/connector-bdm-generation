@@ -1,0 +1,29 @@
+= Bonita BDM generation connector
+
+This connector reads a PostgreSQL database metadata and produces a bdm.zip file
+
+== Connector definition
+
+=== Connector Inputs
+
+The inputs of this connector are defined in the definition.
+
+* jdbcUrl
+* userName
+* password
+* driver
+
+=== Connector Outputs
+
+The outputs of this connector is a `org.bonitasoft.engine.bpm.document.DocumentValue` that can be assigned to a Document in Bonita
+
+== Build a connector project
+
+The connector project is built using Maven.
+
+[source,shell script]
+----
+./mvnw clean verify -D--illegal-access=warn <1>
+----
+
+<1> `-D--illegal-access=warn` is required by groovy version to run container-based tests
