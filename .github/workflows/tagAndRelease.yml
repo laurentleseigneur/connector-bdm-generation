@@ -11,6 +11,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install Java and Maven
+        uses: actions/setup-java@v1.4.3
+        with:
+          java-version: 8
+          server-id: github
+
+      - name: Build and test
+        run: ./mvnw clean verify
+
+      - name: Prepare release
+        run: ./mvnw release:prepare
+
       - uses: qcastel/github-actions-maven-release@v1.12.15
         with:
           release-branch-name: "main"
