@@ -17,19 +17,16 @@ jobs:
           java-version: 8
           server-id: github
 
+      - name: Configure Git user
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+
       - name: Build and test
         run: ./mvnw clean verify
 
       - name: Prepare release
-        run: ./mvnw release:prepare
-
-      - uses: qcastel/github-actions-maven-release@v1.12.15
-        with:
-          release-branch-name: "main"
-          git-release-bot-name: "release-bot"
-          git-release-bot-email: "release-bot@github.com"
-          skip-perform: true
-          access-token: ${{ secrets.GITHUB_TOKEN }}
+        run: ./mvnw release:prepare -Dgpg.skip=true
 
   create-release:
     name: Create Release
