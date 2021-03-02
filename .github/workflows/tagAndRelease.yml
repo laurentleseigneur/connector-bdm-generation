@@ -25,6 +25,9 @@ jobs:
       - name: Build and test
         run: ./mvnw clean verify
 
+      - name: Check plugins
+        run: ./mvnw versions:display-plugin-updates
+
       - name: Prepare release
         run: ./mvnw release:prepare
 
@@ -34,6 +37,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install Java and Maven
+          uses: actions/setup-java@v1.4.3
+          with:
+            java-version: 8
+            server-id: github
+
+      - name: Configure Git user
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -52,10 +66,6 @@ jobs:
         with:
           ref: ${{ steps.previoustag.outputs.tag }}
 
-      - name: Install Java and Maven
-        uses: actions/setup-java@v1
-        with:
-          java-version: 8
 
       #      - name: changelog
       #        uses: scottbrenner/generate-changelog-action@master
