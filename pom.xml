@@ -7,7 +7,7 @@
     </parent>
     <groupId>org.bonitasoft.connectors</groupId>
     <artifactId>connector-bdm-generation</artifactId>
-    <version>1.2</version>
+    <version>1.3-SNAPSHOT</version>
     <name>connector-bdm-generation</name>
     <packaging>jar</packaging>
     <description>this connector generates a bdm.zip file based on existing PostsgreSQL Database schema</description>
@@ -166,6 +166,6 @@
         <url>https://github.com/laurentleseigneur/connector-bdm-generation</url>
         <connection>scm:git:${project.scm.url}.git</connection>
         <developerConnection>scm:git:${project.scm.url}.git</developerConnection>
-        <tag>connector-bdm-generation-1.2</tag>
+        <tag>HEAD</tag>
     </scm>
 </project>
