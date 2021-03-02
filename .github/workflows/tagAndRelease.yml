@@ -26,7 +26,7 @@ jobs:
         run: ./mvnw clean verify
 
       - name: Prepare release
-        run: ./mvnw release:prepare -Dgpg.skip=true
+        run: ./mvnw release:prepare
 
   create-release:
     name: Create Release
