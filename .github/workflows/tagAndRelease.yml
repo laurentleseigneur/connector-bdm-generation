@@ -66,13 +66,6 @@ jobs:
         with:
           ref: ${{ steps.previoustag.outputs.tag }}
 
-
-      #      - name: changelog
-      #        uses: scottbrenner/generate-changelog-action@master
-      #        id: Changelog
-      #        env:
-      #          REPO: ${{ github.repository }}
-
       - name: Build and test archetype
         id: build-connector
         run: |
