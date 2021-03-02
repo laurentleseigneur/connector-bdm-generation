@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.bonitasoft.connectors</groupId>
@@ -8,7 +7,7 @@
     </parent>
     <groupId>org.bonitasoft.connectors</groupId>
     <artifactId>connector-bdm-generation</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <name>connector-bdm-generation</name>
     <packaging>jar</packaging>
     <description>this connector generates a bdm.zip file based on existing PostsgreSQL Database schema</description>
@@ -167,6 +166,6 @@
         <url>https://github.com/laurentleseigneur/connector-bdm-generation</url>
         <connection>scm:git:${project.scm.url}.git</connection>
         <developerConnection>scm:git:${project.scm.url}.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>connector-bdm-generation-1.2</tag>
     </scm>
 </project>
