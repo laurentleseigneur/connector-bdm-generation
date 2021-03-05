@@ -4,7 +4,7 @@ import com.google.common.base.CaseFormat
 import org.bonitasoft.engine.bdm.BusinessObjectModelConverter
 import org.bonitasoft.engine.bdm.model.BusinessObject
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel
-import org.bonitasoft.engine.bdm.model.field.FieldType
+import org.bonitasoft.engine.bdm.model.UniqueConstraint
 import org.bonitasoft.engine.bdm.model.field.RelationField
 import org.bonitasoft.engine.bdm.model.field.SimpleField
 
@@ -27,8 +27,8 @@ class BdmUtils {
             def sqlTableName = tableMetadata.table.table_name.toString().toUpperCase()
             def bdmObjectName = getJavaClassIndentifier("BDM_${sqlTableName}")
             BusinessObject businessObject = new BusinessObject("${packageName}.${bdmObjectName}")
-            def foreignKeys = tableMetadata.foreignKeys
-            addRelationFields(foreignKeys, packageName, excludedFields, businessObject)
+            addRelationFields(tableMetadata.foreignKeys, packageName, excludedFields, businessObject)
+            addPrimaryKeyConstraint(tableMetadata.primaryKey, businessObject)
             def simpleFieldColumns = filterForeignKeyColumns(tableMetadata.columns, excludedFields)
             simpleFieldColumns.each { column ->
                 def name = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, column."column_name")
@@ -60,11 +60,11 @@ class BdmUtils {
                     throw new IllegalArgumentException("field type [${type}] for column [${table.sqlName}.${name}] is not supported!".toString())
                 }
                 field.setType(fieldType)
-                if (field.getType()==STRING) {
-                        def charMaxLength = (column.character_maximum_length as String)?.toInteger()
-                        field.setLength(charMaxLength)
+                if (field.getType() == STRING) {
+                    def charMaxLength = (column.character_maximum_length as String)?.toInteger()
+                    field.setLength(charMaxLength)
                 }
-                if (!field.getLength()){
+                if (!field.getLength()) {
                     //required by studio
                     field.setLength(255)
                 }
@@ -74,6 +74,17 @@ class BdmUtils {
             model.addBusinessObject(businessObject)
         }
         model
+    }
+
+
+    def void addPrimaryKeyConstraint(primaryKey, BusinessObject businessObject) {
+        primaryKey.each { uk ->
+            addUniqueConstraint(uk, businessObject)
+        }
+    }
+
+    def void addUniqueConstraint(uk, BusinessObject businessObject) {
+        businessObject.addUniqueConstraint("PK_${uk.constraint_name}", getJavaFieldIdentifier(uk.column_name))
     }
 
     def addRelationFields(foreignKeys, String packageName, excludedFields, businessObject) {
@@ -102,12 +113,11 @@ class BdmUtils {
     }
 
     def filterForeignKeyColumns(def columns, def excluded) {
-       def simpleFields =  columns.findAll { column ->
+        def simpleFields = columns.findAll { column ->
             !excluded.contains(column.column_name)
         }
         simpleFields
     }
-
 
     File getBdmZip(BusinessObjectModel bom) {
         BusinessObjectModelConverter converter = new BusinessObjectModelConverter()
@@ -116,5 +126,4 @@ class BdmUtils {
         zipFile.bytes = zip
         zipFile
     }
-
 }

@@ -101,9 +101,11 @@ class BdmGeneration implements Connector {
             def result = [:]
             def allTables = sqlUtils.allTables()
             allTables.each { table ->
+                def tableName = table.table_name
                 metadata.add([table      : table,
-                              columns    : sqlUtils.allColumns(table.table_name),
-                              foreignKeys: sqlUtils.allForeignKeys(table.table_name)
+                              columns    : sqlUtils.allColumns(tableName),
+                              foreignKeys: sqlUtils.allForeignKeys(tableName),
+                              primaryKey : sqlUtils.primaryKey(tableName)
                 ])
             }
             result.put("sqlMetadata", metadata)
