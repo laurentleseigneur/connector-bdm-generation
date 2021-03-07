@@ -15,7 +15,7 @@ The inputs of this connector are defined in the definition.
 
 === Connector Outputs
 
-The outputs of this connector is a `org.bonitasoft.engine.bpm.document.DocumentValue` that can be assigned to a Document in Bonita
+Output is an `org.bonitasoft.engine.bpm.document.DocumentValue` that can be assigned to a Document in Bonita
 
 == Build a connector project
 
@@ -26,4 +26,4 @@ The connector project is built using Maven.
 ./mvnw clean verify -D--illegal-access=warn <1>
 ----
 
-<1> `-D--illegal-access=warn` is required by groovy version to run container-based tests
+<1> `-D--illegal-access=warn` is required by current Groovy version to run container-based tests
