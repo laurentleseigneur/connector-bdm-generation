@@ -37,7 +37,7 @@ class BdmGenerationTest extends Specification {
         sqlUtils.disconnect()
     }
 
-    def String getSqlScript(String sqlScript) {
+    String getSqlScript(String sqlScript) {
         def url = getClass().getResource(sqlScript)
         def file = new File(url.toURI())
         file.text
