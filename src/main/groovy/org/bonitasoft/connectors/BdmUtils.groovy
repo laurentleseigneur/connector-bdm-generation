@@ -7,8 +7,11 @@ import org.bonitasoft.engine.bdm.model.BusinessObjectModel
 import org.bonitasoft.engine.bdm.model.UniqueConstraint
 import org.bonitasoft.engine.bdm.model.field.RelationField
 import org.bonitasoft.engine.bdm.model.field.SimpleField
+import org.bonitasoft.engine.bdm.validator.BusinessObjectModelValidator
+import org.bonitasoft.engine.bdm.validator.ValidationStatus
 
 import java.nio.file.Files
+import java.util.logging.Logger
 
 import static org.bonitasoft.engine.bdm.model.field.FieldType.BOOLEAN
 import static org.bonitasoft.engine.bdm.model.field.FieldType.FLOAT
@@ -20,15 +23,17 @@ import static org.bonitasoft.engine.bdm.model.field.FieldType.STRING
 import static org.bonitasoft.engine.bdm.model.field.FieldType.TEXT
 
 class BdmUtils {
+
+    private Logger LOGGER = Logger.getLogger(this.getClass().getName())
+
     BusinessObjectModel generate(String packageName, def metadata) {
         BusinessObjectModel model = new BusinessObjectModel()
         metadata.each { tableMetadata ->
-            def excludedFields = []
             def sqlTableName = tableMetadata.table.table_name.toString().toUpperCase()
             def bdmObjectName = getJavaClassIndentifier("BDM_${sqlTableName}")
             BusinessObject businessObject = new BusinessObject("${packageName}.${bdmObjectName}")
-            addRelationFields(tableMetadata.foreignKeys, packageName, excludedFields, businessObject)
-            addPrimaryKeyConstraint(tableMetadata.primaryKey, businessObject)
+            def excludedFields = addRelationFields(tableMetadata.foreignKeys, packageName, businessObject)
+            addPrimaryKeyConstraint(tableMetadata.primaryKey, businessObject, excludedFields)
             def simpleFieldColumns = filterForeignKeyColumns(tableMetadata.columns, excludedFields)
             simpleFieldColumns.each { column ->
                 def name = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, column."column_name")
@@ -73,35 +78,60 @@ class BdmUtils {
 
             model.addBusinessObject(businessObject)
         }
+        BusinessObjectModelValidator validator = new BusinessObjectModelValidator()
+        ValidationStatus status = validator.validate(model)
+        if (!status.isOk()) {
+            LOGGER.severe("errors in model")
+            status.getStatuses().each {
+                LOGGER.severe(it.toString())
+            }
+            throw new ConnectException("invalid Model")
+        }
         model
     }
 
 
-    def void addPrimaryKeyConstraint(primaryKey, BusinessObject businessObject) {
+    def addPrimaryKeyConstraint(primaryKey, BusinessObject businessObject, excludedFields) {
         primaryKey.each { uk ->
-            addUniqueConstraint(uk, businessObject)
+            addUniqueConstraint(uk, businessObject, excludedFields)
         }
     }
 
-    def void addUniqueConstraint(uk, BusinessObject businessObject) {
-        businessObject.addUniqueConstraint("PK_${uk.constraint_name}", getJavaFieldIdentifier(uk.column_name))
+    def addUniqueConstraint(uk, BusinessObject businessObject, excludedFields) {
+        UniqueConstraint uniqueConstraint = new UniqueConstraint()
+        uniqueConstraint.name = "PK_${uk.constraint_name}"
+        uniqueConstraint.fieldNames = []
+        uk.columns.each { column ->
+            if (!excludedFields.contains(column.column_name)) {
+                uniqueConstraint.fieldNames.add(getJavaFieldIdentifier(column.column_name))
+            }
+        }
+        if (!uniqueConstraint.fieldNames.isEmpty()) {
+            businessObject.addUniqueConstraint(uniqueConstraint)
+        }
     }
 
-    def addRelationFields(foreignKeys, String packageName, excludedFields, businessObject) {
+    def addRelationFields(foreignKeys, String packageName, businessObject) {
+        def excludedFields = []
         foreignKeys.each { foreignKey ->
-            addRelationField(foreignKey, packageName, excludedFields, businessObject)
+            excludedFields.addAll(addRelationField(foreignKey, packageName, businessObject))
         }
+        excludedFields
     }
 
-    def void addRelationField(foreignKey, String packageName, excludedFields, businessObject) {
+    def addRelationField(foreignKey, String packageName, businessObject) {
+        def excludedFields = []
         RelationField relationField = new RelationField()
-        def relationFieldName = foreignKey.column_name.replace("_id", "_OBJECT")
+        def relationFieldName = "${foreignKey.foreign_table_name}_OBJECT"
         relationField.name = getJavaFieldIdentifier(relationFieldName)
         relationField.type = RelationField.Type.AGGREGATION
         relationField.fetchType = RelationField.FetchType.EAGER
         relationField.reference = new BusinessObject("${packageName}.${getJavaClassIndentifier("BDM_${foreignKey.foreign_table_name.toString().toUpperCase()}")}")
-        excludedFields.add(foreignKey.column_name)
+        foreignKey.columns.each {
+            excludedFields.add(it.column_name)
+        }
         businessObject.addField(relationField)
+        excludedFields
     }
 
     def getJavaClassIndentifier(sqlTableName) {
