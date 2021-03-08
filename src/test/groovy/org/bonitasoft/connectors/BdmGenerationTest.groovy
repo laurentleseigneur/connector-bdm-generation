@@ -3,6 +3,7 @@ package org.bonitasoft.connectors
 
 import org.bonitasoft.engine.bdm.model.BusinessObject
 import org.bonitasoft.engine.bdm.model.BusinessObjectModel
+import org.bonitasoft.engine.bdm.model.UniqueConstraint
 import org.bonitasoft.engine.bdm.model.field.RelationField
 import org.postgresql.Driver
 import org.testcontainers.containers.PostgreSQLContainer
@@ -36,7 +37,7 @@ class BdmGenerationTest extends Specification {
         sqlUtils.disconnect()
     }
 
-    def String getSqlScript(String sqlScript) {
+    String getSqlScript(String sqlScript) {
         def url = getClass().getResource(sqlScript)
         def file = new File(url.toURI())
         file.text
@@ -73,6 +74,11 @@ class BdmGenerationTest extends Specification {
         RelationField city = address.fields.get(0)
         city.name == "cityObject"
         city.reference.qualifiedName == 'com.company.model.BdmCity'
+
+        and: 'check unique constraint uses BDM field name'
+        def uniqueConstraint = address.uniqueConstraints.get(0)
+        uniqueConstraint.name == 'PK_address_pkey'
+        uniqueConstraint.fieldNames == ['addressId']
 
         and: 'length is set for all simpleFields'
         businessObjects.each { bo ->
