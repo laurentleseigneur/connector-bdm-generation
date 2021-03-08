@@ -37,5 +37,5 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ steps.get-version.outputs.final-name }}
-          path: target/${{ steps.get-version.outputs.final-name }}
+          name: "${{ steps.get-version.outputs.final-name }}"
+          path: "target/${{ steps.get-version.outputs.final-name }}.zip"
