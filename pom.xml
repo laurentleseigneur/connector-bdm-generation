@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
     <description>this connector generates a bdm.zip file based on existing PostsgreSQL Database schema</description>
     <properties>
-        <bonita.engine.version>7.12.1</bonita.engine.version>
+        <bonita.engine.version>7.15.0</bonita.engine.version>
     </properties>
     <dependencyManagement>
         <dependencies>
